@@ -45,7 +45,7 @@ RUN python3 -m pip install -r /tmp/requirements.txt
 
 #The last step is to run the docker image:
 
-docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_CycleGAN_pytorch -v /home/rhack:/home/rhack <image ID>
+docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_CycleGAN_pytorch -v /home/rhack:/home/rhack image_ID
 
-//you get the image id with the command "docker images"
+//you get the image id with the command "docker images", replace image_ID with the image id you get
 
