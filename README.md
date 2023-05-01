@@ -7,9 +7,11 @@ curl -sSL https://get.docker.com/rootless | sh    // run the script on the url t
 Then you get following Information:
 
 [INFO] Make sure the following environment variable(s) are set (or add them to ~/.bashrc):
+
 export PATH=/home/rhack/bin:$PATH
 
 [INFO] Some applications may require the following environment variable too:
+
 export DOCKER_HOST=unix:///run/user/1027/docker.sock
 
 run both export commands!
@@ -21,6 +23,7 @@ systemctl --user start docker
 #The next step is to build the docker image:
 
 create a folder, name it "docker" and create a file withe the name "Dockerfile"
+
 copy the requirements.txt file into the "docker" folder
 
 copy this into the Dockerfile:
@@ -43,5 +46,6 @@ RUN python3 -m pip install -r /tmp/requirements.txt
 #The last step is to run the docker image:
 
 docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_CycleGAN_pytorch -v /home/rhack:/home/rhack <image ID>
+
 //you get the image id with the command "docker images"
 
