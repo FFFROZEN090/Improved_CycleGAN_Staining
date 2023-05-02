@@ -49,3 +49,14 @@ docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_Cycl
 
 //you get the image id with the command "docker images", replace image_ID with the image id you get
 
+# Table of Contents
+1. [Example](#example)
+2. [Example2](#example2)
+3. [Third Example](#third-example)
+4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+
+
+## Example
+## Example2
+## Third Example
+## [Fourth Example](http://www.fourthexample.com) 
