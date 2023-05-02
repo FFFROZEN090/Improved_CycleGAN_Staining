@@ -1,6 +1,6 @@
-Before you can run the Code, you need a docker Container.
+# Before you can run the Code, you need a docker Container.
 
-#Install Docker:
+# Install Docker:
 
 curl -sSL https://get.docker.com/rootless | sh    // run the script on the url to install docker
 
@@ -20,7 +20,7 @@ Then you can start docker with:
 
 systemctl --user start docker
 
-#The next step is to build the docker image:
+# The next step is to build the docker image:
 
 create a folder, name it "docker" and create a file withe the name "Dockerfile"
 
@@ -43,20 +43,16 @@ RUN python3 -m pip install -r /tmp/requirements.txt
 
 //the two last commands are necessary to use the requirements.txt file
 
-#The last step is to run the docker image:
+# The last step is to run the docker image:
 
 docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_CycleGAN_pytorch -v /home/rhack:/home/rhack image_ID
 
 //you get the image id with the command "docker images", replace image_ID with the image id you get
 
-# Table of Contents
-1. [Example](#example)
-2. [Example2](#example2)
-3. [Third Example](#third-example)
-4. [Fourth Example](#fourth-examplehttpwwwfourthexamplecom)
+# Prepare your own data for CycleGAN
 
+You need to create two directorys to host images from domain A (/path/to/data/trainA) and from domain B (/path/to/data/trainB)
 
-## Example
-## Example2
-## Third Example
-## [Fourth Example](http://www.fourthexample.com) 
+Than you can train the model with:
+
+python train.py --dataroot /{path_to_train_data} --name {experiment_name}
