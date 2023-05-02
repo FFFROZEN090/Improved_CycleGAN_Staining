@@ -56,3 +56,6 @@ You need to create two directorys to host images from domain A (/path/to/data/tr
 Than you can train the model with:
 
 python train.py --dataroot /{path_to_train_data} --name maps_cyclegan --model cycle_gan
+
+python train.py --dataroot {path_to_trainA_and_trainB} --name {name_of_experiment} --results_dir {path_to_results} --name {name_of_experiment} --load_size {load_size} --crop_size {crop_size} --pool_size {pool_size} --model cycle_gan
+
