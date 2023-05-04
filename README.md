@@ -64,3 +64,11 @@ python train.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --
 # Training Options
 
 In the folder "cycle_gan" is a file "train_opt.txt" were you can change the training options.
+
+# Test the model:
+
+Test a CycleGAN model (both sides):
+        python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name maps_cyclegan --model cycle_gan
+        
+    Test a CycleGAN model (one side only):
+        python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data/trainA --name cycle_gan_pretrained --model test --no_dropout
