@@ -63,6 +63,8 @@ _______________________________________________________
 
 //the two last commands are necessary to use the requirements.txt file
 
+navigate into the docker folder and run: docker build .
+
 # The last step is to run the docker image:
 
 docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_CycleGAN_pytorch -v /home/rhack:/home/rhack image_ID
