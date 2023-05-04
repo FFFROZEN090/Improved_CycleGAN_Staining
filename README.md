@@ -1,10 +1,12 @@
-# Frequently asked questions and tipps and the paper:
+# Frequently asked questions and tipps and the paper and Pytorch images:
 
 Questions: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 
 Tipps: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
 
 The Paper: https://diagnosticpathology.biomedcentral.com/articles/10.1186/s13000-021-01126-y#Sec25
+
+Nvidia Pytorch images: https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch/tags
 
 # Before you can run the Code, you need a docker Container.
 
