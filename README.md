@@ -87,6 +87,10 @@ In the folder options" is a file "train_opt.py" were you can change the training
 
 In the folder options" is a file "test_opt.py" were you can change the test options.
 
+# Plot of Training Result:
+
+To view training results and loss plots, run python -m visdom.server and click the URL http://localhost:8097.
+
 # Test the model:
 
 Test a CycleGAN model (both sides):
