@@ -28,7 +28,7 @@ export DOCKER_HOST=unix:///run/user/1027/docker.sock
 
 ___________________________________________________________________________________________________
 
-run both export commands!
+copy both export commands into the shell and run them!
 
 Then you can start docker with:
 
