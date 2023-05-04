@@ -91,7 +91,7 @@ In the folder options" is a file "test_opt.py" were you can change the test opti
 
 # Plot of Training Result:
 
-To view training results and loss plots, run python -m visdom.server and click the URL http://localhost:8097.
+To view training results and loss plots, run: python -m visdom.server and click the URL http://localhost:8097.
 
 # Test the model:
 
