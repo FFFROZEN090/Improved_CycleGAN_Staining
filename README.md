@@ -1,3 +1,7 @@
+# Prüfungs und Studienordnung Informatik
+
+https://backend.uni-heidelberg.de/de/dokumente/studien-und-pruefungsordnung-informatik-ba-2022-10-05/download
+
 # Frequently asked questions and tipps and the paper and Pytorch images:
 
 Questions: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
