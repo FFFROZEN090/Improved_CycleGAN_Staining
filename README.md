@@ -32,14 +32,15 @@ systemctl --user start docker
 
 # The next step is to build the docker image:
 
-create a folder, name it "docker" and create a file withe the name "Dockerfile"
+create a folder, name it "docker" and create a file in it with the name "Dockerfile"
 
 copy the requirements.txt file into the "docker" folder
 
 copy this into the Dockerfile:
 
-FROM nvcr.io/nvidia/pytorch:21.02-py3
+_________________________________________
 
+FROM nvcr.io/nvidia/pytorch:21.02-py3
 
 RUN set -ex
 
@@ -50,6 +51,7 @@ RUN pip install dominate
 COPY requirements.txt /tmp/requirements.txt
 
 RUN python3 -m pip install -r /tmp/requirements.txt
+_______________________________________________________
 
 //the two last commands are necessary to use the requirements.txt file
 
