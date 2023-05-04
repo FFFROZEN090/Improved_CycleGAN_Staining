@@ -53,9 +53,14 @@ docker run --gpus all --rm -it --name CycleGAN -w /home/rhack/stainTransfer_Cycl
 
 You need to create two directorys to host images from domain A (/path/to/data/trainA) and from domain B (/path/to/data/trainB)
 
-Than you can train the model with:
-
-python train.py --dataroot /{path_to_train_data} --name maps_cyclegan --model cycle_gan
+# Than you can train the model with:
 
 python train.py --dataroot {path_to_trainA_and_trainB} --name {name_of_experiment} --results_dir {path_to_results} --name {name_of_experiment} --load_size {load_size} --crop_size {crop_size} --pool_size {pool_size} --model cycle_gan
 
+I have used this actually(04.05.23):
+
+python train.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name cycle_gan --results_dir /home/rhack/stainTransfer_CycleGAN_pytorch --name cycle_gan  --model cycle_gan
+
+# Training Options
+
+In the folder "cycle_gan" is a file "train_opt.txt" were you can change the training options.
