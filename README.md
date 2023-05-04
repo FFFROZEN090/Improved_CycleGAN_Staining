@@ -12,6 +12,8 @@ curl -sSL https://get.docker.com/rootless | sh    // run the script on the url t
 
 Then you get following Information:
 
+_____________________________________________________________________________________________
+
 [INFO] Make sure the following environment variable(s) are set (or add them to ~/.bashrc):
 
 export PATH=/home/rhack/bin:$PATH
@@ -19,6 +21,8 @@ export PATH=/home/rhack/bin:$PATH
 [INFO] Some applications may require the following environment variable too:
 
 export DOCKER_HOST=unix:///run/user/1027/docker.sock
+
+___________________________________________________________________________________________________
 
 run both export commands!
 
