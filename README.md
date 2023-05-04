@@ -1,3 +1,9 @@
+# Frequently asked questions and tipps:
+
+Questions: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
+
+Tipps: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/tips.md
+
 # Before you can run the Code, you need a docker Container.
 
 # Install Docker:
@@ -61,9 +67,11 @@ I have used this actually(04.05.23):
 
 python train.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name cycle_gan --results_dir /home/rhack/stainTransfer_CycleGAN_pytorch --name cycle_gan  --model cycle_gan
 
-# Training Options
+# Training Options/Test Options
 
-In the folder "cycle_gan" is a file "train_opt.txt" were you can change the training options.
+In the folder options" is a file "train_opt.py" were you can change the training options.
+
+In the folder options" is a file "test_opt.py" were you can change the test options.
 
 # Test the model:
 
