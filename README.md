@@ -1,4 +1,26 @@
-Hallo
+# Git commands:
+Git global setup:
+
+git config --global user.name "rhack"
+
+git config --global user.email "robin.hack@stud.uni-heidelberg.de"
+
+Existing Folder:
+
+cd existing folder
+git init
+
+git remote add origin http://gitlab.medma.uni-heidelberg.de/mbai_dmri/Cell_cycleGAN.git
+
+git add .
+
+git commit -m "some comment"
+
+git push -u origin master
+
+If hard reset is necessary:
+
+git reset --hard origin/<branch_name>
 
 # Prüfungs und Studienordnung Informatik
 
