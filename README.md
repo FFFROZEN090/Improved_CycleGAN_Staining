@@ -7,7 +7,8 @@ git config --global user.email "robin.hack@stud.uni-heidelberg.de"
 
 Existing Folder:
 
-cd existing folder
+cd existing folder 
+
 git init
 
 git remote add origin http://gitlab.medma.uni-heidelberg.de/mbai_dmri/Cell_cycleGAN.git
@@ -115,12 +116,23 @@ In the folder options" is a file "test_opt.py" were you can change the test opti
 
 # Plot of Training Result:
 
-To view training results and loss plots, run: python -m visdom.server and click the URL http://localhost:8097.
+Scripts for that are in the "scripts folder"
 
 # Test the model:
 
-Test a CycleGAN model (both sides):
-        python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name maps_cyclegan --model cycle_gan
-        
-    Test a CycleGAN model (one side only):
-        python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data/trainA --name cycle_gan_pretrained --model test --no_dropout
+python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/HeLa --name mitos_atipya --model cycle_gan
+
+_______________________________________________________________________________________________________________________________________________________
+
+python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name mitos_atipya --model test
+
+-> that work:
+
+root@a78b5be0fefc:/home/rhack/stainTransfer_CycleGAN_pytorch# python test.py --dataroot /home/rhack/stainTransfer_CycleGAN_pytorch/to/data --name mitos_atipya --model test --model_suffix "_A" --no_dropout
+
+Solution found here:
+https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/issues/296
+
+
+
+--name :hier werden im Ordner results die Gewichte der gespeicherten Modelle geholt.Wobei die Gewichte aus den Ordnern mit latest_net_G_A oder latest_net_G_B geholt werden.

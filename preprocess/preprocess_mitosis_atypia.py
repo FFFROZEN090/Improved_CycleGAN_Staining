@@ -1,7 +1,7 @@
 import cv2
 import math
 import os
-from util.util import assure_path_exists
+#from util.util import assure_path_exists
 
 def resize_image(img, x, y):
     dsize = (x, y)
@@ -26,11 +26,11 @@ if __name__ == '__main__':
     nums = ["06", "08", "09", "13", "16"]
     for num in nums:
         folder = domain + num
-        input_dir = "Z:/Marlen/datasets/MITOS-ATYPIA-14/extract/" + task + "/" + folder + "/frames/" + res
+        input_dir = "/home/rhack/Cell_cycleGAN/MITOS-ATYPIA-14/extract/" + task + "/" + folder + "/frames/" + res
         # path to output
-        output_dir = "Z:/Marlen/datasets/MITOS-ATYPIA-14/train_test_256/" + res + "/" + folder + "_tilesize_" + str(256) + "_offset_" + str(offs) + "/"
+        output_dir = "/home/rhack/Cell_cycleGAN/MITOS-ATYPIA-14/train_test256/" + res + "/" + folder + "_tilesize_" + str(256) + "_offset_" + str(offs) + "/"
         print(output_dir)
-        assure_path_exists(output_dir)
+        #assure_path_exists(output_dir)
 
         # go through each image in directory
         for filename in os.listdir(input_dir):

@@ -1,0 +1,40 @@
+#wrote in Python3
+#Code ran in Jupyter Notebook
+#Important is to delete first 2 rows in the loss.log file
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+
+data = pd.read_csv(r"C:\Users\rob\Desktop\PythonPlots\loss_log.txt.txt",sep=" ", header=None)
+
+data = pd.DataFrame(data)
+
+epoch = data[1]
+
+D_A = data[9]
+
+G_A = data[11]
+
+cycle_A = data[13]
+
+plt.figure(figsize=(15,5))
+
+plt.plot(epoch, D_A, label='D_A')
+
+plt.plot(epoch, G_A, label='G_A')
+
+plt.plot(epoch, cycle_A, label='Cycle Consistency A' )
+
+plt.title('Loss Kurven CycleGAN')
+
+plt.ylabel('Loss')
+
+plt.xlabel('Epoch')
+
+#plt.xticks(epoch[::3])
+
+plt.legend()
+
+plt.show()
