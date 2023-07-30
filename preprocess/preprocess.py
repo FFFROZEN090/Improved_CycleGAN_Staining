@@ -1,7 +1,7 @@
 import cv2
 import math
 import os
-#from util.util import assure_path_exists
+from util.util import assure_path_exists
 
 def resize_image(img, x, y):
     dsize = (x, y)
@@ -11,26 +11,27 @@ def resize_image(img, x, y):
 
 if __name__ == '__main__':
     # width and height for image resizing
-    new_size_x = 1024
-    new_size_y = 1024
+    new_size_x = 512
+    new_size_y = 512
     # tile and offset size, if offset size is same as tile size, the tiles are non-overlapping, if smaller, they are overlapping, if bigger, some pixels are skipped
-    tile = 256
+    tile = 192
     offs = 256 #int(tile - tile / 2)
     tile_size = (tile, tile)
     offset = (offs, offs)
     # build path to input
     task = "test"
     res = "x40"
-    domain = "A"
-    # nums = ["03", "04", "05", "07", "10", "11", "12", "14", "15", "17", "18"]
-    nums = ["06", "08", "09", "13", "16"]
+    domain = "H"
+    #nums = ["03", "04", "05", "07", "10", "11", "12", "14", "15", "17", "18"]
+    nums = ["03", "04", "05"]
+    #nums = ["06", "08", "09", "13", "16"]
     for num in nums:
         folder = domain + num
-        input_dir = "/home/rhack/Cell_cycleGAN/MITOS-ATYPIA-14/extract/" + task + "/" + folder + "/frames/" + res
+        input_dir = "/home/rhack/stainTransfer_CycleGAN_pytorch/FakultyData/extract"
         # path to output
-        output_dir = "/home/rhack/Cell_cycleGAN/MITOS-ATYPIA-14/train_test256/" + res + "/" + folder + "_tilesize_" + str(256) + "_offset_" + str(offs) + "/"
+        output_dir = "/home/rhack/stainTransfer_CycleGAN_pytorch/FakultyData/result/"
         print(output_dir)
-        #assure_path_exists(output_dir)
+        assure_path_exists(output_dir)
 
         # go through each image in directory
         for filename in os.listdir(input_dir):
