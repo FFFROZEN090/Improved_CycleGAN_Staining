@@ -1,0 +1,12 @@
+Cycle_GAN_data_training/
+Cycle_GAN_data_training
+data_training/
+data_training
+FakultyData/
+FakultyData
+results/
+results
+*.png
+*.tiff
+*.tif
+*.pyc
