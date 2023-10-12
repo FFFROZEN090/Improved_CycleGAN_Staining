@@ -7,34 +7,32 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
-data = pd.read_csv(r"C:\Users\rob\Desktop\PythonPlots\loss_log.txt.txt",sep=" ", header=None)
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
+import numpy as np
 
-data = pd.DataFrame(data)
+# Read data using regex as a delimiter
+data = pd.read_csv(r"/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/GOWT_Inverse/cycle_gan/loss_log.txt", 
+                   sep=r"\s+|:", header=None, engine='python')
 
-epoch = data[1]
+# Extract relevant columns
+epoch = data[2]
+D_A = data[14]
+G_A = data[17]
+cycle_A = data[20]
 
-D_A = data[9]
-
-G_A = data[11]
-
-cycle_A = data[13]
-
+# Plotting
 plt.figure(figsize=(15,5))
-
 plt.plot(epoch, D_A, label='D_A')
-
 plt.plot(epoch, G_A, label='G_A')
-
 plt.plot(epoch, cycle_A, label='Cycle Consistency A' )
-
 plt.title('Loss Kurven CycleGAN')
-
 plt.ylabel('Loss')
-
 plt.xlabel('Epoch')
-
-#plt.xticks(epoch[::3])
-
 plt.legend()
-
+# Save plot
+plt.savefig('CycleGAN_loss_A_plot.png')
 plt.show()
+
+
