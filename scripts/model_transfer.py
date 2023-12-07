@@ -2,8 +2,8 @@ import os
 import shutil
 
 # Define the source directory and the destination directory
-src_dir = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/GOWT_Inverse/cycle_gan'
-dst_dir = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/staining_results/GOWT_Inverse'  # Or another destination directory
+src_dir = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/training_dataset_tiledGOWT_Fakulty_Inverse/cycle_gan'
+dst_dir = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/staining_results/training_dataset_tiledGOWT_Fakulty_Inverse_valA'  # Or another destination directory
 
 # Loop through the numbers 5 to 60 in increments of 5
 for i in range(5, 65, 5):

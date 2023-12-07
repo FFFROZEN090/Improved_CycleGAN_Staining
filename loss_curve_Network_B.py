@@ -4,7 +4,7 @@ import os
 import numpy as np
 
 
-data = pd.read_csv(r"C:\Users\rob\Desktop\PythonPlots\loss_log_Versuch16.txt.txt",sep=" ", header=None)
+data = pd.read_csv(r"/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/training_dataset_tiledGOWT_Fakulty_Inverse/cycle_gan/loss_log.txt",sep=" ", header=None)
 
 data = pd.DataFrame(data)
 print(data)
@@ -41,7 +41,7 @@ plt.xlabel('Step')
 
 plt.legend()
 
-plt.savefig('LossKurvenCycleGAN')
+plt.savefig('LossKurvenCycleGAN_B')
 
 plt.show()
 

@@ -11,7 +11,7 @@ There are theory principles for evaluating the model:
     the original image. To test the similarity of the grayscale variation. 
 
 3.  Statistical comparison of the color distribution of the staining result and the
-    original image use KL divergence for each color in RGB space.
+    original image use KL divergence for each color in HSV space.
 """
 
 import cv2
@@ -26,11 +26,16 @@ from skimage.metrics import structural_similarity as ssim
 
 
 # Directory paths
-stained_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
+stained_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse'
 ground_truth_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
-colorized_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/training_dataset_GOWT_Inverse/trainB/'
-binary_convert_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/Binary_Convert/'
+colorized_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Training_Datasets/training_dataset_tiledGOWT_Fakulty_Inverse/trainB'
+binary_convert_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse/Binary_Convert/'
 
+'''
+    This function is used to evaluate the stained image with the ground truth.
+    The principle is to convert the stained image into binary image and compare to ground truth pixel wise.
+
+'''
 def GroundTruthLoss(stained_img, ground_truth_img):
 
     # Convert RGB image to binary image
@@ -54,6 +59,12 @@ def GroundTruthLoss(stained_img, ground_truth_img):
     # Return the loss
     return loss
 
+
+'''
+    This function is used to evaluate the stained image with the original image.
+    The principle is to convert the stained image and the original image into grayscale image and compare the grayscale variation.
+    Compute MSE, PSNR and SSIM.
+'''
 def GrayscaleLoss(stained_img, original_img):
     # Convert to grayscale
     stained_gray = cv2.cvtColor(stained_img, cv2.COLOR_BGR2GRAY)
@@ -72,8 +83,14 @@ def GrayscaleLoss(stained_img, original_img):
     # Compute SSIM
     ssim_value = ssim(stained_gray, original_gray)
     
-    return ssim_value
+    return psnr
 
+
+'''
+    This function is used to evaluate the stained image with the target image.
+    The principle is to calculate the color distribution of the stained image and the target image.
+    Convert the color distribution into histogram and compare the histogram using KL divergence.
+'''
 def calculate_aggregate_hsv_histogram(img_dir):
     aggregate_hist = np.zeros((256 * 3,))
 
@@ -118,13 +135,18 @@ def evaluate_image(stained_img, ground_truth_img):
     return principle1, principle2
 
 
+def rescale_values(values, min_value, max_value):
+    scaled_values = (values - min_value) / (max_value - min_value)
+    return scaled_values
+
+
 # Iterate over each epoch
 results_file_path = os.path.join(stained_img_base_path, 'evaluation_results.txt')
 aggregate_hist_colorized = calculate_aggregate_hsv_histogram(colorized_img_base_path)
 # Initialize empty lists to hold metric values
 principle1_means = []
 principle2_means = []
-principle3_means = []
+principle3_values = []
 overall_scores = []
 epochs = []
 try:    
@@ -160,34 +182,54 @@ try:
         principle3 = ColorLoss(epoch_path, aggregate_hist_colorized)
 
         # Create results figure
+
+
+        # Assuming results is a list of tuples where each tuple contains the values of principle1 and principle2 for a single image
+        principle1_values = np.array([result[0] for result in results])
+        principle2_values = np.array([result[1] for result in results])
+
+        # Rescale principle1, principle2, and principle3 values to the range [0, 1] separately
+        principle1_scaled = rescale_values(principle1_values, principle1_values.min(), principle1_values.max())
+        principle2_scaled = rescale_values(principle2_values, principle2_values.min(), principle2_values.max())
+        # assuming principle3 is an array; if not, replace np.min(principle3) and np.max(principle3) with the actual min and max values
+        
+        # Now use the rescaled values to compute the mean and overall score
+        mean_principle1_scaled = np.mean(principle1_scaled)
+        mean_principle2_scaled = np.mean(principle2_scaled)
+        
         # (Inside your epoch loop, append metric values)
-        principle1_means.append(mean_results[0])
-        principle2_means.append(mean_results[1])
-        principle3_means.append(principle3)
-        overall_scores.append(0.4 * mean_results[0] + 0.55 * mean_results[1] + 0.05 * principle3)
         epochs.append(epoch)
 
+        principle1_means.append(mean_principle1_scaled)
+        principle2_means.append(mean_principle2_scaled)
+        principle3_values.append(principle3)
 
-        # Open results file in append mode ('a')
-        with open(results_file_path, 'a') as f:
-            f.write(f'\nEpoch: {epoch}\n')
-            f.write(f'Principle 1 mean: {mean_results[0]}\n')
-            f.write(f'Principle 2 mean: {mean_results[1]}\n')
-            f.write(f'Principle 3 mean: {principle3}\n')
-            f.write(f'Overall Score: {0.4 * mean_results[0] + 0.55 * mean_results[1] + 0.05 * principle3}\n')
-
-            print(f'Finished evaluation for epoch {epoch}')
 
 except Exception as e:
     print(f"An error occurred: {e}")
 
 
+# Calculate the mean of principle 3
+principle3_means = rescale_values(principle3_values, np.min(principle3_values), np.max(principle3_values))
+
+# Calculate the overall score
+overall_scores = 0.45 * np.array(principle1_means) + 0.45 * np.array(principle2_means) + 0.1 * np.array(principle3_means)
+
+# Save the results to a file from Epoch5 to Epoch60
+for i in range(len(epochs)):
+    with open(results_file_path, 'a') as f:
+        f.write(f'Epoch {epochs[i]}: Principle 1: {principle1_means[i]}, Principle 2: {principle2_means[i]}, Principle 3: {principle3_means[i]}, Overall Score: {overall_scores[i]}\n')
+        f.close()
+
+
+
+
 plt.figure(figsize=(10, 6))
 
 # Plot each metric
-plt.plot(epochs, principle1_means, label='Principle 1 mean', marker='o')
-plt.plot(epochs, principle2_means, label='Principle 2 mean', marker='x')
-plt.plot(epochs, principle3_means, label='Principle 3 mean', marker='s')
+plt.plot(epochs, principle1_means, label='Accuracy mean', marker='o')
+plt.plot(epochs, principle2_means, label='SSIM', marker='x')
+plt.plot(epochs, principle3_means, label='Color Correlation', marker='s')
 plt.plot(epochs, overall_scores, label='Overall Score', marker='d')
 
 # Add labels and title
@@ -198,5 +240,5 @@ plt.title('Evaluation Metrics over Epochs')
 # Add a legend
 plt.legend()
 
-# Save the plot
-plt.savefig('/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/evaluation_metrics.png', format='png')
+# Save the plot under stained_img_base_path
+plt.savefig(os.path.join(stained_img_base_path, 'evaluation_metrics.png'))

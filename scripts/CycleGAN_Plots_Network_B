@@ -13,9 +13,9 @@ import os
 import numpy as np
 
 # Read data using regex as a delimiter
-data = pd.read_csv(r"/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/GOWT_Inverse/cycle_gan/loss_log.txt", 
+data = pd.read_csv(r"/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/training_dataset_tiledGOWT_Fakulty_Inverse/cycle_gan/loss_log.txt", 
                    sep=r"\s+|:", header=None, engine='python')
-
+print(data)
 # Extract relevant columns
 epoch = data[2]
 D_B = data[26]

@@ -2,10 +2,10 @@ import os
 import shutil
 
 # Source directory path
-source_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/staining_results/GOWT_Inverse/'
+source_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/staining_results/training_dataset_tiledGOWT_Fakulty_Inverse_valA/'
 
 # Target directory path
-target_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse'
+target_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse_valA'
 
 # Iterate over each epoch folder
 for epoch in range(5, 65, 5):  # Starts at Epoch5 and ends at Epoch60, incrementing by 5

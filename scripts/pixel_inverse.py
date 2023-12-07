@@ -24,6 +24,6 @@ def invert_images(input_directory, output_directory):
             print(f"Inverted and saved: {filename}")
 
 # Example usage
-input_directory_path = '/home/frozen/Data_Sets/train_GOWT_binary'  # Replace with your input directory path
-output_directory_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/AA/testA'  # Replace with your output directory path
+input_directory_path = '/home/frozen/Experiments_Repitition/Cell_GAN/GOWT_binary/Input/val'  # Replace with your input directory path
+output_directory_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/AA/valA'  # Replace with your output directory path
 invert_images(input_directory_path, output_directory_path)
