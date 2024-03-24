@@ -64,3 +64,24 @@ plt.grid(True)
 # Save plot to file
 B_path = os.path.join('/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/training_dataset_tiledGOWT_Fakulty_Inverse/cycle_gan', 'data_B.png')
 plt.savefig(B_path)
+
+# Calculate general loss L for each epoch
+general_loss = {}
+for epoch in mean_metrics_A.keys():
+    L = (mean_metrics_A[epoch].get('G_A', 0) + mean_metrics_B[epoch].get('G_B', 0) +
+         mean_metrics_A[epoch].get('cycle_A', 0) + mean_metrics_B[epoch].get('cycle_B', 0) +
+         mean_metrics_A[epoch].get('idt_A', 0) + mean_metrics_B[epoch].get('idt_B', 0))
+    general_loss[epoch] = L
+
+# Plot general loss
+plt.figure(figsize=(10, 5))
+plt.plot(list(general_loss.keys()), list(general_loss.values()), label='General Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss Value')
+plt.title('General Loss over Epochs')
+plt.legend()
+plt.grid(True)
+
+# Save the plot to a file
+loss_path = os.path.join('/home/frozen/Experiments_Repitition/Cell_cycleGAN/results/training_dataset_tiledGOWT_Fakulty_Inverse/cycle_gan', 'general_loss.png')  # Replace with the actual directory
+plt.savefig(loss_path)

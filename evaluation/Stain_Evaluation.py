@@ -117,8 +117,6 @@ def ColorLoss(stained_img_dir, aggregate_hist_colorized):
     aggregate_hist_stained /= aggregate_hist_stained.sum()
     aggregate_hist_colorized /= aggregate_hist_colorized.sum()
 
-    chi_square_loss = 0.5 * np.sum(((aggregate_hist_stained - aggregate_hist_colorized) ** 2) / (aggregate_hist_stained + aggregate_hist_colorized + 1e-6))
-    emd_loss = wasserstein_distance(aggregate_hist_stained, aggregate_hist_colorized)
     correlation_loss = distance.correlation(aggregate_hist_stained, aggregate_hist_colorized)
 
     return correlation_loss
