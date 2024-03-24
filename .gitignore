@@ -14,6 +14,8 @@ training_dataset_GOWT_Inverse/
 training_dataset_GOWT_Inverse
 Evaluation_Dataset/
 Evaluation_Dataset
+Training_Datasets/
+Training_Datasets
 results/
 results
 *.png
@@ -22,3 +24,6 @@ results
 *.pyc
 *.bmp
 *.csv
+docker/built_image_pytorch.sh
+docker/config_rootless_docker.sh
+docker/run_rootlessdocker.sh

@@ -138,3 +138,29 @@ def assure_path_exists(path):
     dir = os.path.dirname(path)
     if not os.path.exists(dir):
         os.makedirs(dir)
+        
+
+"""
+Read Images from a directory with specitic surfix
+Parameters:
+    dir_path (str) -- the path of the directory
+    surfix (str) -- the surfix of the images
+Return:
+    images (numpy array list) -- a list of images
+"""
+
+def read_images(dir_path, surfix):
+    images = []
+    for file in os.listdir(dir_path):
+        if file.endswith(surfix):
+            img = Image.open(os.path.join(dir_path, file))
+            images.append(np.array(img))
+    return images
+
+# Define Main Function
+if __name__ == '__main__':
+    # Test the function of read_images
+    dir_path = 'test_images'
+    surfix = '.png'
+    images = read_images(dir_path, surfix)
+    print('The number of images in %s is %d' % (dir_path, len(images)))

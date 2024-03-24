@@ -1,1 +1,1 @@
-docker build -t cell_cycle_gan_docker:$(date +%Y-%m-%d) .
+docker build -t cv_final:$(date +%Y-%m-%d) .

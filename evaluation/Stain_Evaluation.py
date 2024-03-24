@@ -21,14 +21,19 @@ from scipy.stats import wasserstein_distance
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
 from skimage.metrics import structural_similarity as ssim
+import torch
+from torchvision.models import inception_v3
+from torchvision.transforms import functional as TF
+from scipy.linalg import sqrtm
+from PIL import Image
 
 
 
 
 # Directory paths
-stained_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse'
-ground_truth_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
-colorized_img_base_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Training_Datasets/training_dataset_tiledGOWT_Fakulty_Inverse/trainB'
+stained_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse'
+ground_truth_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
+colorized_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Training_Datasets/training_dataset_tiledGOWT_Fakulty_Inverse/trainB'
 binary_convert_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse/Binary_Convert/'
 
 '''
@@ -122,6 +127,43 @@ def ColorLoss(stained_img_dir, aggregate_hist_colorized):
     return correlation_loss
 
 
+# Function to calculate Frechet Inception Distance (FID)
+def calculate_fid(model, real_images, fake_images):
+    # Ensure model is in eval mode
+    model.eval()
+    
+    # Preprocess images & calculate features
+    def preprocess_images(images):
+        processed_images = [TF.resize(img, [299, 299]) for img in images]
+        processed_images = torch.stack(processed_images)
+        processed_images = (processed_images - 0.5) / 0.5  # Normalize to [-1, 1]
+        return processed_images
+    
+    # Calculate activations
+    def get_activations(images):
+        with torch.no_grad():
+            pred = model(preprocess_images(images))
+        return pred.detach().cpu().numpy()
+    
+    # Preprocess images
+    real_images = preprocess_images(real_images)
+    fake_images = preprocess_images(fake_images)
+    
+    # Calculate mean and covariance
+    real_activations = get_activations(real_images)
+    fake_activations = get_activations(fake_images)
+    mu1, sigma1 = real_activations.mean(axis=0), np.cov(real_activations, rowvar=False)
+    mu2, sigma2 = fake_activations.mean(axis=0), np.cov(fake_activations, rowvar=False)
+    
+    # Calculate FID
+    ssdiff = np.sum((mu1 - mu2) ** 2.0)
+    covmean = sqrtm(sigma1.dot(sigma2))
+    if np.iscomplexobj(covmean):
+        covmean = covmean.real
+    fid = ssdiff + np.trace(sigma1 + sigma2 - 2.0 * covmean)
+    return fid
+
+
 
 def evaluate_image(stained_img, ground_truth_img):
     # Principle 1: Compare stained image with ground truth (using, e.g., mean squared error)
@@ -138,16 +180,42 @@ def rescale_values(values, min_value, max_value):
     return scaled_values
 
 
-# Iterate over each epoch
-results_file_path = os.path.join(stained_img_base_path, 'evaluation_results.txt')
-aggregate_hist_colorized = calculate_aggregate_hsv_histogram(colorized_img_base_path)
-# Initialize empty lists to hold metric values
-principle1_means = []
-principle2_means = []
-principle3_values = []
-overall_scores = []
-epochs = []
-try:    
+"""
+Read Images from a directory with specitic surfix
+Parameters:
+    dir_path (str) -- the path of the directory
+    surfix (str) -- the surfix of the images
+Return:
+    images (numpy array list) -- a list of images
+"""
+
+def read_images(dir_path, surfix):
+    images = []
+    for file in os.listdir(dir_path):
+        if file.endswith(surfix):
+            img = Image.open(os.path.join(dir_path, file))
+            images.append(img)
+    # Convert images to tensor
+    images = [TF.to_tensor(img) for img in images]
+    return images
+
+
+
+
+# Main function
+if __name__ == '__main__':
+    # Iterate over each epoch
+    results_file_path = os.path.join(stained_img_base_path, 'evaluation_results.txt')
+    aggregate_hist_colorized = calculate_aggregate_hsv_histogram(colorized_img_base_path)
+    # Initialize empty lists to hold metric values
+    principle1_means = []
+    principle2_means = []
+    principle3_values = []
+    fid_values = []
+    overall_scores = []
+    epochs = []
+
+
     for epoch in range(5, 65, 5):
         epoch_path = os.path.join(stained_img_base_path, f'Epoch{epoch}')
         print(f'Starting evaluation for epoch {epoch}')
@@ -179,7 +247,20 @@ try:
         mean_results = np.mean(results, axis=0)
         principle3 = ColorLoss(epoch_path, aggregate_hist_colorized)
 
-        # Create results figure
+        # Using FID for Evaluation
+        # Calculate FID
+        fid_model = inception_v3(pretrained=True)
+        fid_model.fc = torch.nn.Identity()
+        # Read images
+        real_images = read_images(colorized_img_base_path, "tiff")
+        fake_images = read_images(epoch_path, "tiff")
+
+        # Check the size of the images
+        if len(real_images) == 0 or len(fake_images) == 0:
+            print("No images found in the directory")
+            exit()
+
+        fid = calculate_fid(fid_model, real_images, fake_images)
 
 
         # Assuming results is a list of tuples where each tuple contains the values of principle1 and principle2 for a single image
@@ -201,42 +282,44 @@ try:
         principle1_means.append(mean_principle1_scaled)
         principle2_means.append(mean_principle2_scaled)
         principle3_values.append(principle3)
-
-
-except Exception as e:
-    print(f"An error occurred: {e}")
-
-
-# Calculate the mean of principle 3
-principle3_means = rescale_values(principle3_values, np.min(principle3_values), np.max(principle3_values))
-
-# Calculate the overall score
-overall_scores = 0.45 * np.array(principle1_means) + 0.45 * np.array(principle2_means) + 0.1 * np.array(principle3_means)
-
-# Save the results to a file from Epoch5 to Epoch60
-for i in range(len(epochs)):
-    with open(results_file_path, 'a') as f:
-        f.write(f'Epoch {epochs[i]}: Principle 1: {principle1_means[i]}, Principle 2: {principle2_means[i]}, Principle 3: {principle3_means[i]}, Overall Score: {overall_scores[i]}\n')
-        f.close()
+        fid_values.append(fid)
 
 
 
 
-plt.figure(figsize=(10, 6))
+    # Calculate the mean of principle 3
+    principle3_means = rescale_values(principle3_values, np.min(principle3_values), np.max(principle3_values))
 
-# Plot each metric
-plt.plot(epochs, principle1_means, label='Accuracy mean', marker='o')
-plt.plot(epochs, principle2_means, label='SSIM', marker='x')
-plt.plot(epochs, principle3_means, label='Color Correlation', marker='s')
-plt.plot(epochs, overall_scores, label='Overall Score', marker='d')
+    # Calculate the overall score
+    overall_scores = 0.45 * np.array(principle1_means) + 0.45 * np.array(principle2_means) + 0.1 * np.array(principle3_means)
 
-# Add labels and title
-plt.xlabel('Epochs')
-plt.ylabel('Metric Value')
-plt.title('Evaluation Metrics over Epochs')
+    # Save the results to a file from Epoch5 to Epoch60
+    for i in range(len(epochs)):
+        with open(results_file_path, 'a') as f:
+            f.write(f'Epoch {epochs[i]}: Principle 1: {principle1_means[i]}, Principle 2: {principle2_means[i]}, Principle 3: {principle3_means[i]}, Overall Score: {overall_scores[i]}, FID Score: {fid_values[i]}\n')
+            f.close()
 
-# Add a legend
-plt.legend()
 
-# Save the plot under stained_img_base_path
-plt.savefig(os.path.join(stained_img_base_path, 'evaluation_metrics.png'))
+
+
+    plt.figure(figsize=(10, 6))
+
+    # Plot each metric
+    plt.plot(epochs, principle1_means, label='Accuracy mean', marker='o')
+    plt.plot(epochs, principle2_means, label='SSIM', marker='x')
+    plt.plot(epochs, principle3_means, label='Color Correlation', marker='s')
+    plt.plot(epochs, overall_scores, label='Overall Score', marker='d')
+
+    # Add labels and title
+    plt.xlabel('Epochs')
+    plt.ylabel('Metric Value')
+    plt.title('Evaluation Metrics over Epochs')
+
+    # Add a legend
+    plt.legend()
+
+    # Save the plot under stained_img_base_path
+    plt.savefig(os.path.join(stained_img_base_path, 'evaluation_metrics.png'))
+
+
+    # Save the FID values to a file
