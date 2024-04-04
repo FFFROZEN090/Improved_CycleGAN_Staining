@@ -43,13 +43,16 @@ class ImprovedUnalignedDataset(BaseDataset):
         if btoA:
             print("Direction BtoA is not supported for ImprovedUnalignedDataset")
             exit()
+
+
+        params = {'flip': random.random() > 0.5, 'crop_pos': (0, 0)}
         
         self.A_tf_type = 'grayscale'
         self.B_tf_type = 'RGB'
         self.A_GT_tf_type = 'RGB'
-        self.transform_A = get_transform(self.opt, grayscale=self.A_tf_type)
+        self.transform_A = get_transform(self.opt, params=params, grayscale=self.A_tf_type)
         self.transform_B = get_transform(self.opt, grayscale=self.B_tf_type)
-        self.transform_A_GT = get_transform(self.opt, grayscale=self.A_GT_tf_type)
+        self.transform_A_GT = get_transform(self.opt, params=params, grayscale=self.A_GT_tf_type)
 
     def __getitem__(self, index):
         """Return a data point and its metadata information.
