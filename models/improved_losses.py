@@ -28,7 +28,7 @@ def denormalize(tensor):
     :param tensor: Tensor image
     :return: Denormalized tensor image
     """
-    return (tensor + 1.0 / 2.0) * 255
+    return ( (tensor + 1.0) / 2.0) * 255
 
 
 def RGBBin2Bin(tensor):
@@ -72,14 +72,17 @@ def GT_Loss(images_A, images_GT):
 
     # Convert images B from RGB formated Binary images to Binary images
     images_GT = RGBBin2Bin(images_GT)
+    images_GT = denormalize(images_GT)
 
     # Check if images_A and Images_B have the same shape
     if images_A.shape != images_GT.shape:
         raise ValueError("The input images must have the same shape")
     
     # Check if the images only contain pixel values between 0 and 255
-    if images_A.min() < 0 or images_A.max() > 255 or images_GT.min() < 0 or images_GT.max() > 255:
-        raise ValueError("The input images must have pixel values between 0 and 255")
+    if images_A.min() < 0 or images_A.max() > 255:
+        raise ValueError("The input images A must have pixel values between 0 or 255")
+    if images_GT.min() < 0 or images_GT.max() > 255:
+        raise ValueError("The input images GT must have pixel values between 0 or 255")
     
     # Calculate the Ground Truth Loss for this batch
     loss = torch.mean(torch.abs(images_A - images_GT))
@@ -116,10 +119,10 @@ def ColorVariation_Loss(images_Real, images_Fake):
     for i in range(images_Real.shape[0]):
         
         # Convert Fake images to Gray Scale
-        fake_gray = cv2.cvtColor(denormalize(images_Fake[i].cpu().numpy()).astype(np.uint8), cv2.COLOR_RGB2GRAY)
+        fake_gray = cv2.cvtColor(denormalize(images_Fake[i].cpu().detach().numpy()).astype(np.uint8), cv2.COLOR_RGB2GRAY)
 
         # Convert Real images to Gray Scale
-        real_gray = denormalize(images_Real[i].cpu().numpy()).astype(np.uint8)
+        real_gray = denormalize(images_Real[i].cpu().detach().numpy()).astype(np.uint8)
 
         # Compute ssim value
         loss += ssim(fake_gray, real_gray, data_range=255)
@@ -149,10 +152,10 @@ def HSV_Loss(images_A, images_B):
     loss = 0
     for i in range(images_A.shape[0]):
         # Convert images A to numpy array
-        img_A = denormalize(images_A[i].cpu().numpy()).astype(np.uint8)
+        img_A = denormalize(images_A[i].cpu().detach().numpy()).astype(np.uint8)
 
         # Convert images B to numpy array
-        img_B = denormalize(images_B[i].cpu().numpy()).astype(np.uint8)
+        img_B = denormalize(images_B[i].cpu().detach().numpy()).astype(np.uint8)
 
         # Convert images A to HSV space
         img_A = cv2.cvtColor(img_A, cv2.COLOR_RGB2HSV)

@@ -169,13 +169,8 @@ class SegCycleGANModel(BaseModel):
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
 
-
-        # Calculate the new losses
-        self.loss_GT_A = improved_losses.GT_Loss(self.real_A, self.real_A_GT)
-        self.loss_color_variation_A = improved_losses.ColorVariation_Loss(self.fake_A, self.real_A)
-        self.loss_hsv_A = improved_losses.HSV_Loss(self.fake_A, self.real_B)
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_GT_A + self.loss_color_variation_A + self.loss_hsv_A
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
 
 
         self.loss_G.backward()
@@ -203,6 +198,13 @@ class SegCycleGANModel(BaseModel):
         self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
+
+        # Calculate the new losses
+        self.loss_GT_A = improved_losses.GT_Loss(self.real_A, self.real_A_GT)
+        self.loss_color_variation_A = improved_losses.ColorVariation_Loss(self.real_A, self.fake_B)
+        self.loss_hsv_A = improved_losses.HSV_Loss(self.fake_B, self.real_B)
+
+        
         # combined loss and calculate gradients
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
         self.loss_G.backward()
