@@ -65,6 +65,12 @@ def GT_Loss(images_A, images_GT):
     :param images_B: Ground Truth images torch tensor
     :return: Ground Truth Loss
     """
+    
+
+    # Create temporary directory to save the images
+    if not os.path.exists("temp"):
+        os.makedirs("temp")
+
 
     # Convert images_A to binary images use the threshold 127
     images_A = denormalize(images_A)
@@ -85,11 +91,12 @@ def GT_Loss(images_A, images_GT):
         raise ValueError("The input images GT must have pixel values between 0 or 255")
     
     # Calculate the Ground Truth Loss for this batch
-    loss = torch.mean(torch.abs(images_A - images_GT))
+    loss = torch.sum(torch.abs(images_A - images_GT))
 
     # Nornalize the loss value by calculate the portion of the loss value to the theortical maximum loss value
-    max_loss = 255 * images_A.shape[1] * images_A.shape[2] * images_A.shape[3]
+    max_loss = 255 * (images_A.shape[0] * images_A.shape[2] * images_A.shape[3])
     loss = loss / max_loss
+
 
     return loss
 
@@ -125,7 +132,7 @@ def ColorVariation_Loss(images_Real, images_Fake):
         real_gray = denormalize(images_Real[i].cpu().detach().numpy()).astype(np.uint8)
 
         # Compute ssim value
-        loss += ssim(fake_gray, real_gray, data_range=255)
+        loss += ( ssim(fake_gray, real_gray, data_range=255) + 1 ) / 2
 
     # Calculate the average loss value
     loss = 1 - loss / images_Real.shape[0]
@@ -174,7 +181,7 @@ def HSV_Loss(images_A, images_B):
     hist_B = hist_B / hist_B.sum()
 
     # Calculate Correlation Coefficient
-    loss = distance.correlation(hist_A.flatten(), hist_B.flatten())
+    loss = 1 - ( distance.correlation(hist_A.flatten(), hist_B.flatten()) + 1 ) / 2
 
     return loss
 

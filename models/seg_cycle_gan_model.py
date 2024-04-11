@@ -60,7 +60,7 @@ class SegCycleGANModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'D_B', 'G_B', 'cycle_B', 'idt_B', 'GT_A', 'color_variation_A', 'hsv_A']
+        self.loss_names = ['D_A', 'G_A', 'cycle_A', 'idt_A', 'D_B', 'G_B', 'cycle_B', 'idt_B', 'GT_fake', 'color_variation_fake', 'hsv_fake', 'GT_rec', 'color_variation_rec', 'hsv_rec']
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
         visual_names_A = ['real_A', 'fake_B', 'rec_A']
         visual_names_B = ['real_B', 'fake_A', 'rec_B']
@@ -152,36 +152,13 @@ class SegCycleGANModel(BaseModel):
         fake_A = self.fake_A_pool.query(self.fake_A)
         self.loss_D_B = self.backward_D_basic(self.netD_B, self.real_A, fake_A)
 
-    def backward_G(self):
-        """Calculate the loss for generators G_A and G_B"""
-        lambda_A = self.opt.lambda_A
-        lambda_B = self.opt.lambda_B
-        # Identity loss
-        self.loss_idt_A = 0
-        self.loss_idt_B = 0
-
-        # GAN loss D_A(G_A(A))
-        self.loss_G_A = self.criterionGAN(self.netD_A(self.fake_B), True)
-        # GAN loss D_B(G_B(B))
-        self.loss_G_B = self.criterionGAN(self.netD_B(self.fake_A), True)
-        # Forward cycle loss || G_B(G_A(A)) - A||
-        self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A
-        # Backward cycle loss || G_A(G_B(B)) - B||
-        self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
-
-        # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
-
-
-        self.loss_G.backward()
-
     """
     By introducing new losses, we need to modify the optimize_parameters function.
     loss_GT_A: Loss for Colorized images compare to the Ground Truth
     loss_color_variation_A: Loss for Colorized images colorvariation after convert to Gray Scale
     loss_hsv_A: Distance for Colorized images and Target images in HSV space
     """
-    def backward_G_Optimized(self):
+    def backward_G(self):
         """Calculate the loss for generators G_A and G_B"""
         
         lambda_A = self.opt.lambda_A
@@ -199,14 +176,17 @@ class SegCycleGANModel(BaseModel):
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
 
-        # Calculate the new losses
-        self.loss_GT_A = improved_losses.GT_Loss(self.real_A, self.real_A_GT)
-        self.loss_color_variation_A = improved_losses.ColorVariation_Loss(self.real_A, self.fake_B)
-        self.loss_hsv_A = improved_losses.HSV_Loss(self.fake_B, self.real_B)
+        self.loss_GT_fake = improved_losses.GT_Loss(self.fake_A, self.real_A_GT)
+        self.loss_color_variation_fake = improved_losses.ColorVariation_Loss(self.real_A, self.fake_B)
+        self.loss_hsv_fake = improved_losses.HSV_Loss(self.fake_B, self.real_B)
+
+        self.loss_GT_rec = improved_losses.GT_Loss(self.rec_A, self.real_A_GT)
+        self.loss_color_variation_rec = improved_losses.ColorVariation_Loss(self.real_A, self.rec_B)
+        self.loss_hsv_rec = improved_losses.HSV_Loss(self.rec_B, self.real_B)
 
         
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + 5 * self.loss_GT_rec + 5 * self.loss_color_variation_rec + 10 * self.loss_hsv_rec + 5 * self.loss_GT_fake + 5 * self.loss_color_variation_fake + 10 * self.loss_hsv_fake
         self.loss_G.backward()
 
     def optimize_parameters(self):
@@ -216,7 +196,7 @@ class SegCycleGANModel(BaseModel):
         # G_A and G_B
         self.set_requires_grad([self.netD_A, self.netD_B], False)  # Ds require no gradients when optimizing Gs
         self.optimizer_G.zero_grad()  # set G_A and G_B's gradients to zero
-        self.backward_G_Optimized()             # calculate gradients for G_A and G_B
+        self.backward_G()             # calculate gradients for G_A and G_B
         self.optimizer_G.step()       # update G_A and G_B's weights
         # D_A and D_B
         self.set_requires_grad([self.netD_A, self.netD_B], True)

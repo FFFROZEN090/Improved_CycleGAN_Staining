@@ -26,15 +26,12 @@ from torchvision.models import inception_v3
 from torchvision.transforms import functional as TF
 from scipy.linalg import sqrtm
 from PIL import Image
+import argparse
 
 
 
 
-# Directory paths
-stained_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse'
-ground_truth_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
-colorized_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Training_Datasets/training_dataset_tiledGOWT_Fakulty_Inverse/trainB'
-binary_convert_path = '/home/frozen/Experiments_Repitition/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse/Binary_Convert/'
+
 
 '''
     This function is used to evaluate the stained image with the ground truth.
@@ -199,11 +196,7 @@ def read_images(dir_path, surfix):
     images = [TF.to_tensor(img) for img in images]
     return images
 
-
-
-
-# Main function
-if __name__ == '__main__':
+def main(stained_img_base_path, ground_truth_img_base_path, colorized_img_base_path, n_epochs=60):
     # Iterate over each epoch
     results_file_path = os.path.join(stained_img_base_path, 'evaluation_results.txt')
     aggregate_hist_colorized = calculate_aggregate_hsv_histogram(colorized_img_base_path)
@@ -216,7 +209,7 @@ if __name__ == '__main__':
     epochs = []
 
 
-    for epoch in range(5, 65, 5):
+    for epoch in range(5, n_epochs, 5):
         epoch_path = os.path.join(stained_img_base_path, f'Epoch{epoch}')
         print(f'Starting evaluation for epoch {epoch}')
 
@@ -253,7 +246,7 @@ if __name__ == '__main__':
         fid_model.fc = torch.nn.Identity()
         # Read images
         real_images = read_images(colorized_img_base_path, "tiff")
-        fake_images = read_images(epoch_path, "tiff")
+        fake_images = read_images(epoch_path, "png")
 
         # Check the size of the images
         if len(real_images) == 0 or len(fake_images) == 0:
@@ -322,4 +315,37 @@ if __name__ == '__main__':
     plt.savefig(os.path.join(stained_img_base_path, 'evaluation_metrics.png'))
 
 
-    # Save the FID values to a file
+    # Plot FID in a separate plot
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs, fid_values, label='FID', marker='o')
+    plt.xlabel('Epochs')
+    plt.ylabel('FID Value')
+    plt.title('FID over Epochs')
+    plt.legend()
+
+    # Save the plot under stained_img_base_path
+    plt.savefig(os.path.join(stained_img_base_path, 'FID.png'))
+
+""" 
+# Directory paths
+stained_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/training_dataset_tiledGOWT_Fakulty_Inverse'
+ground_truth_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Evaluation_Dataset/GOWT_Inverse/'
+colorized_img_base_path = '/home/frozen/CV_FinalProject/Cell_cycleGAN/Training_Datasets/training_dataset_tiledGOWT_Fakulty_Inverse/trainB'
+
+"""
+# Main function
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Evaluate the model for the stain transfer task.")
+
+    # The following arguments are required
+    parser.add_argument("stained_img_base_path", type=str, help="The base path to the directory containing the stained images.")
+    parser.add_argument("ground_truth_img_base_path", type=str, help="The base path to the directory containing the ground truth images.")
+    parser.add_argument("colorized_img_base_path", type=str, help="The base path to the directory containing the colorized images.")
+    parser.add_argument("n_epochs", type=int, help="The number of epochs to evaluate the model for.")
+
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+    
+    # Call the main function with the directory path
+    main(args.stained_img_base_path, args.ground_truth_img_base_path, args.colorized_img_base_path, args.n_epochs)
